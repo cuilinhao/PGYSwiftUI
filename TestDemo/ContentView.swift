@@ -29,6 +29,7 @@ struct FormatSegmentedPicker: View {
 
     var body: some View {
         HStack(spacing: 0) {
+            // 第一行 3个胶囊 TIFF
             ForEach(ImageFormat.allCases, id: \.self) { format in
                 Button {
                     withAnimation(.easeInOut(duration: 0.2)) {
@@ -106,6 +107,7 @@ struct ResolutionPicker: View {
     // MARK: - Combined View 所有的视图
 
 struct CameraFormatPickerView: View {
+    
     @State private var selectedFormat: ImageFormat = .tiff
     @State private var selectedResolution: Resolution = .mp12
 
