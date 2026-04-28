@@ -84,8 +84,12 @@ struct ResolutionPicker: View {
                 Text(verbatim: "12MP")
                     .fontWeight(selection == .mp12 ? .semibold : .medium)
                     .foregroundStyle(selection == .mp12 ? selectedColor : .white.opacity(0.65))
-                    .padding(.leading, 24)
-                    .padding(.trailing, 22)
+                
+                    //.padding(.leading, isAutoOnlyUnsupported ? 46 : 24)
+                    //.padding(.trailing, isAutoOnlyUnsupported ? 44 : 22)
+                
+                    .padding(.leading, 46)
+                    .padding(.trailing, 44)
                     .padding(.vertical, 7)
             }
             .buttonStyle(.plain)
