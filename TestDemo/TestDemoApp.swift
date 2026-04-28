@@ -11,7 +11,9 @@ import SwiftUI
 struct TestDemoApp: App {
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            //ContentView(model: ImgModel.init(ss: .timeLapse))
+            CameraFormatPickerView()
+            
         }
     }
 }
