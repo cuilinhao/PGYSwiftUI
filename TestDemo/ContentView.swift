@@ -22,7 +22,7 @@ enum Resolution: String, CaseIterable {
     }
 }
 
-// MARK: - Format Picker
+// MARK: - Format Picker 上面三个
 
 struct FormatSegmentedPicker: View {
     @Binding var selection: ImageFormat
@@ -59,7 +59,7 @@ struct FormatSegmentedPicker: View {
     }
 }
 
-// MARK: - Resolution Picker
+// MARK: - Resolution Picker 下面2个
 
 struct ResolutionPicker: View {
     @Binding var selection: Resolution
@@ -118,13 +118,28 @@ struct CameraFormatPickerView: View {
             VStack(spacing: 16) {
                 FormatSegmentedPicker(selection: $selectedFormat)
                     .frame(width: 280)
-                
 
                 ResolutionPicker(selection: $selectedResolution)
                 Spacer()
             }
             .padding(.top, 90)
+            
+            
+            // TODO: - TODO
+            Color.blue
+                .frame(width: 200, height: 200)
+                .overlay(alignment: .bottom) {
+                    ZStack(alignment: .center) {
+//                        Capsule()//胶囊
+//                            .frame(width: 100, height: 100)
+                        Ellipse() //椭圆
+                            .frame(width: 100, height: 120, alignment: .top)
+                        
+                    }
+                }
         }
+        
+        
     }
 }
 
