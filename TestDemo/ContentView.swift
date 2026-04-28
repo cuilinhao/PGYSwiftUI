@@ -13,13 +13,6 @@ enum ImageFormat: String, CaseIterable {
 enum Resolution: String, CaseIterable {
     case mp12 = "12MP"
     case mp48 = "48MP"
-
-    var subtitle: String? {
-        switch self {
-        case .mp48: return "仅M档支持"
-        default: return nil
-        }
-    }
 }
 
 // MARK: - Format Picker 上面三个
@@ -37,15 +30,15 @@ struct FormatSegmentedPicker: View {
                     }
                 } label: {
                     Text(format.rawValue)
-                        .font(.system(size: 15, weight: selection == format ? .semibold : .regular))
-                        .foregroundColor(selection == format ? .white : Color.white.opacity(0.6))
+                        .font(.system(size: 15, weight: selection == format ? .semibold : .medium))
+                        .foregroundStyle(selection == format ? .white : .white.opacity(0.85))
                         .frame(maxWidth: .infinity)
-                        .padding(.vertical, 8)
+                        .padding(.vertical, 9)
                         .background(
                             Group {
                                 if selection == format {
                                     Capsule()
-                                        .stroke(Color.orange, lineWidth: 2)
+                                        .stroke(.orange, lineWidth: 1.2)
                                         .padding(1)
                                 }
                             }
@@ -55,51 +48,83 @@ struct FormatSegmentedPicker: View {
             }
         }
         .padding(.horizontal, 4)
-        .background(Color(.systemPurple))
+        .background(.black.opacity(0.55))
         .clipShape(Capsule())
     }
 }
 
-// MARK: - Resolution Picker 下面2个
+// MARK: - Resolution Picker 下面2个 12MP | 48MP
 
 struct ResolutionPicker: View {
     @Binding var selection: Resolution
+    @Binding var telephotoSelection: Resolution
+
+    var isAutoMode: Bool
+    var isTelephotoMode: Bool
+    var isPhotoHighResSupported: Bool
+
+    private var isAutoOnlyUnsupported: Bool {
+        isAutoMode && !isTelephotoMode
+    }
+
+    private var selectedColor: Color {
+        .orange
+    }
 
     var body: some View {
         HStack(spacing: 0) {
-            ForEach(Resolution.allCases.indices, id: \.self) { index in
-                let res = Resolution.allCases[index]
-
-                Button {
-                    withAnimation(.easeInOut(duration: 0.2)) {
-                        selection = res
+            Button {
+                withAnimation(.easeInOut(duration: 0.2)) {
+                    if isTelephotoMode {
+                        telephotoSelection = .mp12
                     }
-                } label: {
-                    HStack(spacing: 3) {
-                        Text(res.rawValue)
-                            .font(.system(size: 14, weight: .semibold))
-                            .foregroundColor(selection == res ? .orange : Color.white.opacity(0.5))
-
-                        if let sub = res.subtitle {
-                            Text(sub)
-                                .font(.system(size: 10))
-                                .foregroundColor(Color.white.opacity(0.45))
-                        }
-                    }
-                    .padding(.horizontal, 16)
-                    .padding(.vertical, 6)
+                    selection = .mp12
                 }
-                .buttonStyle(.plain)
-
-                // Divider between items
-                if index < Resolution.allCases.count - 1 {
-                    Rectangle()
-                        .fill(Color.white.opacity(0.25))
-                        .frame(width: 1, height: 16)
-                }
+            } label: {
+                Text(verbatim: "12MP")
+                    .fontWeight(selection == .mp12 ? .semibold : .medium)
+                    .foregroundStyle(selection == .mp12 ? selectedColor : .white.opacity(0.65))
+                    .padding(.leading, 24)
+                    .padding(.trailing, 22)
+                    .padding(.vertical, 7)
             }
+            .buttonStyle(.plain)
+
+            Rectangle()
+                .fill(.white.opacity(0.38))
+                .frame(width: 1, height: 15)
+
+            Button {
+                withAnimation(.easeInOut(duration: 0.2)) {
+                    if isTelephotoMode {
+                        telephotoSelection = .mp48
+                    }
+                    selection = .mp48
+                }
+            } label: {
+                HStack(spacing: 2) {
+                    Text(verbatim: "48MP")
+                        .fontWeight(selection == .mp48 ? .semibold : .medium)
+                        .foregroundStyle(
+                            selection == .mp48
+                            ? selectedColor
+                            : .white.opacity(isAutoOnlyUnsupported ? 0.45 : 0.65)
+                        )
+
+                    if isAutoOnlyUnsupported {
+                        Text("(仅M档支持)")
+                            .font(.system(size: 9))
+                            .foregroundStyle(.white.opacity(0.45))
+                    }
+                }
+                .padding(.leading, 22)
+                .padding(.trailing, isAutoOnlyUnsupported ? 11 : 24)
+                .padding(.vertical, 7)
+            }
+            .buttonStyle(.plain)
         }
-        .background(Color(white: 0.15).opacity(0.6))
+        .font(.system(size: 14))
+        .background(.black.opacity(0.48))
         .clipShape(Capsule())
     }
 }
@@ -110,35 +135,38 @@ struct CameraFormatPickerView: View {
     
     @State private var selectedFormat: ImageFormat = .tiff
     @State private var selectedResolution: Resolution = .mp12
+    @State private var selectedTelephotoResolution: Resolution = .mp12
+    @State private var isAutoMode = true
+    @State private var isTelephotoMode = false
+    @State private var isPhotoHighResSupported = true
 
     var body: some View {
         ZStack {
             // Dark camera-like background
-            Color(.systemGreen)
+            LinearGradient(
+                colors: [
+                    Color(red: 0.12, green: 0.14, blue: 0.10),
+                    Color(red: 0.42, green: 0.43, blue: 0.36)
+                ],
+                startPoint: .top,
+                endPoint: .bottom
+            )
                 .ignoresSafeArea()
 
-            VStack(spacing: 16) {
+            VStack(spacing: 14) {
                 FormatSegmentedPicker(selection: $selectedFormat)
-                    .frame(width: 280)
+                    .frame(width: 360)
 
-                ResolutionPicker(selection: $selectedResolution)
+                ResolutionPicker(
+                    selection: $selectedResolution,
+                    telephotoSelection: $selectedTelephotoResolution,
+                    isAutoMode: isAutoMode,
+                    isTelephotoMode: isTelephotoMode,
+                    isPhotoHighResSupported: isPhotoHighResSupported
+                )
                 Spacer()
             }
-            .padding(.top, 90)
-            
-            
-            // TODO: - TODO
-            Color.blue
-                .frame(width: 200, height: 200)
-                .overlay(alignment: .bottom) {
-                    ZStack(alignment: .center) {
-//                        Capsule()//胶囊
-//                            .frame(width: 100, height: 100)
-                        Ellipse() //椭圆
-                            .frame(width: 100, height: 120, alignment: .top)
-                        
-                    }
-                }
+            .padding(.top, 18)
         }
         
         
