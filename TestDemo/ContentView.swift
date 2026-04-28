@@ -103,7 +103,7 @@ struct ResolutionPicker: View {
     }
 }
 
-// MARK: - Combined View
+    // MARK: - Combined View 所有的视图
 
 struct CameraFormatPickerView: View {
     @State private var selectedFormat: ImageFormat = .tiff
@@ -112,15 +112,18 @@ struct CameraFormatPickerView: View {
     var body: some View {
         ZStack {
             // Dark camera-like background
-            Color(white: 0.12)
+            Color(.systemGreen)
                 .ignoresSafeArea()
 
             VStack(spacing: 16) {
                 FormatSegmentedPicker(selection: $selectedFormat)
                     .frame(width: 280)
+                
 
                 ResolutionPicker(selection: $selectedResolution)
+                Spacer()
             }
+            .padding(.top, 90)
         }
     }
 }
